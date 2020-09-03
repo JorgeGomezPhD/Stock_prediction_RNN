@@ -1,5 +1,5 @@
 # Description: This program uses an artificial recurrent neural network called Long Short Term Memory (LSTM) to
-# predict the closing stock price of a corporation (Halliburton Inc.) using the past 60 day stock price.
+# predict the closing stock price of the stock you would like by using the past 60 day stock price.
 
 # Import the libraries
 import math
