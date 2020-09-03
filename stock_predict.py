@@ -32,29 +32,27 @@ with open(f'{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
 
-for i in range(10):
-    # Compute the number of rows to train the model on
-    training_data_len = math.ceil(len(dataset) * .9)  # round up
+# Compute the number of rows to train the model on
+training_data_len = math.ceil(len(dataset) * .9)  # round up
+# Scale the all of the data to be values between 0 and 1
+scaler = MinMaxScaler(feature_range=(0, 1))
+scaled_data = scaler.fit_transform(dataset)
 
-    # Scale the all of the data to be values between 0 and 1
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(dataset)
+# Create the scaled training data set
+train_data = scaled_data[0:training_data_len, :]
+# Split the data into x_train and y_train data sets
+x_train = []
+y_train = []
+for i in range(60, len(train_data)):
+    x_train.append(train_data[i - 60:i, 0])
+    y_train.append(train_data[i, 0])
 
-    # Create the scaled training data set
-    train_data = scaled_data[0:training_data_len, :]
-    # Split the data into x_train and y_train data sets
-    x_train = []
-    y_train = []
-    for i in range(60, len(train_data)):
-        x_train.append(train_data[i - 60:i, 0])
-        y_train.append(train_data[i, 0])
+# Convert x_train and y_train to numpy arrays
+x_train, y_train = np.array(x_train), np.array(y_train)
 
-    # Convert x_train and y_train to numpy arrays
-    x_train, y_train = np.array(x_train), np.array(y_train)
-
-    # Reshape the data into the shape accepted by the LSTM
-    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-
+# Reshape the data into the shape accepted by the LSTM
+x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
+for i in range(1):
     # Build the LSTM network model
     model = Sequential()
     model.add(LSTM(units=100, return_sequences=True, input_shape=(x_train.shape[1], 1)))
@@ -118,10 +116,7 @@ for i in range(10):
     #undo the scaling
     pred_price = scaler.inverse_transform(pred_price)
     pred_price = pred_price[-1][-1]
-    # stock_list = []
-    # total_rmse = []
-    # stock_list.append(pred_price)
-    # total_rmse.append(rmse)
+
     print(pred_price)
     print(rmse)
     #  Writing to Predicted price and RMSE to CSV file
@@ -130,18 +125,14 @@ for i in range(10):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writerow({'Predicted Price': pred_price, 'RMSE': rmse})
 
-    # print(pred_price)
-
-#  Bringing back in the predicted and RMSE data to take the average
+#  Bringing back  the predicted and RMSE data back to take the average
 data_file = pd.read_csv(f'{date_today}_{stock}_Stock_Prediction.csv')
 predicted_price_list = data_file['Predicted Price']
 rmse = data_file['RMSE']
 average_stock = mean(predicted_price_list)
 average_rmse = mean(rmse)
 
-# print(f"The predicted value for {stock} stock is: {pred_price[-1]}")
-
-# # Get the quote for today's stock (Sep. 2, 2020).
+# # Get the quote for Sep. 2, 2020 stock
 stock_quote2 = web.DataReader(stock, data_source='yahoo', start='2020-09-01', end='2020-09-01')
 print(f"Average price for {stock} stock = {round(average_stock, 2)}")
 # print(f"Average RMSE for {stock} stock = {round(average_rmse, 2)}")
