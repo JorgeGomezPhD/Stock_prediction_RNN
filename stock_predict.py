@@ -12,6 +12,7 @@ from keras.layers import Dense, LSTM
 import csv
 from statistics import mean
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 stock = input('What stock do you want to predict? ')
 start_date = '2012-01-01'
@@ -28,12 +29,12 @@ dataset = data.values
 
 #  Writing CSV to use later on
 with open(f'{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
-    fieldnames = ['Predicted Price', 'RMSE']
+    fieldnames = ['Predicted Price', 'RMSE', 'Avg Predicted price', 'Actual Price']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
 
 # Compute the number of rows to train the model on
-training_data_len = math.ceil(len(dataset) * .9)  # round up
+training_data_len = math.ceil(len(dataset) * .85)  # round up
 # Scale the all of the data to be values between 0 and 1
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled_data = scaler.fit_transform(dataset)
@@ -52,7 +53,9 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 
 # Reshape the data into the shape accepted by the LSTM
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-for i in range(1):
+
+#running 10 times to take an average
+for i in range(3):
     # Build the LSTM network model
     model = Sequential()
     model.add(LSTM(units=100, return_sequences=True, input_shape=(x_train.shape[1], 1)))
@@ -119,6 +122,17 @@ for i in range(1):
 
     print(pred_price)
     print(rmse)
+
+    # #Visualize the data
+    plt.figure(figsize=(16,8))
+    plt.title('Model')
+    plt.xlabel('Date', fontsize=18)
+    plt.ylabel('Close Price USD ($)', fontsize=18)
+    plt.plot(train['Close'])
+    plt.plot(valid[['Close', 'Predictions']])
+    plt.legend(['Train', 'Val', 'Predictions'])
+    plt.savefig(f'{date_today}_{stock}_Stock_Prediction.jpg')
+
     #  Writing to Predicted price and RMSE to CSV file
     with open(f'{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
         fieldnames = ['Predicted Price', 'RMSE']
@@ -133,7 +147,14 @@ average_stock = mean(predicted_price_list)
 average_rmse = mean(rmse)
 
 # # Get the quote for Sep. 2, 2020 stock
-stock_quote2 = web.DataReader(stock, data_source='yahoo', start='2020-09-01', end='2020-09-01')
-print(f"Average price for {stock} stock = {round(average_stock, 2)}")
+stock_quote2 = web.DataReader(stock, data_source='yahoo', start='2020-09-02', end='2020-09-02')
+print(f"Average predicted price for {stock} stock = {round(average_stock, 2)}")
 # print(f"Average RMSE for {stock} stock = {round(average_rmse, 2)}")
 print(f"The actual value for {stock} stock is: {stock_quote2['Close'][-1]}")
+
+#  Saving the average stock price and the actual stock price to CSV
+with open(f'{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
+    fieldnames = ['Predicted Price', 'RMSE', 'Avg Predicted price', 'Actual Price']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writerow({'Predicted Price': ' ', 'RMSE': ' ', 'Avg Predicted price': average_stock, 'Actual Price': stock_quote2['Close'][-1]})
+
