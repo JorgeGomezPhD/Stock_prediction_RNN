@@ -1,5 +1,5 @@
 # Description: This program uses an artificial recurrent neural network called Long Short Term Memory (LSTM) to
-# predict the closing stock price of the stock you would like by using the past 60 day stock price.
+# predict the closing stock price of the stock you would like by using the past 90 day stock price.
 
 # Import the libraries
 import math
@@ -18,6 +18,7 @@ stock = input('What stock do you want to predict? ')
 start_date = '2012-01-01'
 end_date = '2020-09-01'
 date_today = datetime.today().strftime('%Y-%m-%d')
+pred_days = 90
 
 # Get the stock quote
 df = web.DataReader(stock, data_source='yahoo', start=start_date, end=end_date)
@@ -44,8 +45,8 @@ train_data = scaled_data[0:training_data_len, :]
 # Split the data into x_train and y_train data sets
 x_train = []
 y_train = []
-for i in range(60, len(train_data)):
-    x_train.append(train_data[i - 60:i, 0])
+for i in range(pred_days, len(train_data)):
+    x_train.append(train_data[i - pred_days:i, 0])
     y_train.append(train_data[i, 0])
 
 # Convert x_train and y_train to numpy arrays
@@ -55,7 +56,7 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
 #running 10 times to take an average
-for i in range(3):
+for i in range(10):
     # Build the LSTM network model
     model = Sequential()
     model.add(LSTM(units=100, return_sequences=True, input_shape=(x_train.shape[1], 1)))
@@ -70,13 +71,13 @@ for i in range(3):
     model.fit(x_train, y_train, batch_size=1, epochs=1)
 
     # Test data set
-    test_data = scaled_data[training_data_len - 60:, :]
+    test_data = scaled_data[training_data_len - pred_days:, :]
     # Create the x_test and y_test data sets
     x_test = []
     y_test = dataset[training_data_len:,
              :]  # Get all of the rows from index 1603 to the rest and all of the columns (in this case it's only column 'Close'), so 2003 - 1603 = 400 rows of data
-    for i in range(60, len(test_data)):
-        x_test.append(test_data[i - 60:i, 0])
+    for i in range(pred_days, len(test_data)):
+        x_test.append(test_data[i - pred_days:i, 0])
 
     # Convert x_test to a numpy array
     x_test = np.array(x_test)
@@ -102,14 +103,14 @@ for i in range(3):
 
     #Create a new dataframe
     new_df = df.filter(['Close'])
-    #Get the last 60 day closing price in array form
-    last_60_days = new_df[-60:].values
+    #Get the last pred_days day closing price in array form
+    last_pred_days_days = new_df[-pred_days:].values
     #Scale the data to be values between 0 and 1
-    last_60_days_scaled = scaler.transform(last_60_days)
+    last_pred_days_days_scaled = scaler.transform(last_pred_days_days)
     #Create an empty list
     X_test = []
-    #Append teh past 60 days
-    X_test.append(last_60_days_scaled)
+    #Append teh past pred_days days
+    X_test.append(last_pred_days_days_scaled)
     #Convert the X_test data set to a numpy array
     X_test = np.array(X_test)
     #Reshape the data
