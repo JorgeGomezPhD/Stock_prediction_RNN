@@ -55,8 +55,8 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 # Reshape the data into the shape accepted by the LSTM
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
-#running 10 times to take an average
-for i in range(10):
+# running 10 times to take an average
+for index in range(1,11):
     # Build the LSTM network model
     model = Sequential()
     model.add(LSTM(units=100, return_sequences=True, input_shape=(x_train.shape[1], 1)))
@@ -98,26 +98,26 @@ for i in range(10):
     valid = data[training_data_len:]
     valid['Predictions'] = predictions
 
-    #Show the valid and predicted prices
+    # Show the valid and predicted prices
     # print(valid)
 
-    #Create a new dataframe
+    # Create a new dataframe
     new_df = df.filter(['Close'])
-    #Get the last pred_days day closing price in array form
+    # Get the last pred_days day closing price in array form
     last_pred_days_days = new_df[-pred_days:].values
-    #Scale the data to be values between 0 and 1
+    # Scale the data to be values between 0 and 1
     last_pred_days_days_scaled = scaler.transform(last_pred_days_days)
-    #Create an empty list
+    # Create an empty list
     X_test = []
-    #Append teh past pred_days days
+    # Append teh past pred_days days
     X_test.append(last_pred_days_days_scaled)
-    #Convert the X_test data set to a numpy array
+    # Convert the X_test data set to a numpy array
     X_test = np.array(X_test)
-    #Reshape the data
+    # Reshape the data
     X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-    #Get the predicted scaled price
+    # Get the predicted scaled price
     pred_price = model.predict(X_test)
-    #undo the scaling
+    # undo the scaling
     pred_price = scaler.inverse_transform(pred_price)
     pred_price = pred_price[-1][-1]
 
@@ -125,14 +125,14 @@ for i in range(10):
     print(rmse)
 
     # #Visualize the data
-    plt.figure(figsize=(16,8))
+    plt.figure(figsize=(16, 8))
     plt.title('Model')
     plt.xlabel('Date', fontsize=18)
     plt.ylabel('Close Price USD ($)', fontsize=18)
     plt.plot(train['Close'])
     plt.plot(valid[['Close', 'Predictions']])
     plt.legend(['Train', 'Val', 'Predictions'])
-    plt.savefig(f'{date_today}_{stock}_Stock_Prediction.jpg')
+    plt.savefig(f'{index}_{date_today}_{stock}_Stock_Prediction.jpg')
 
     #  Writing to Predicted price and RMSE to CSV file
     with open(f'{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
@@ -157,5 +157,5 @@ print(f"The actual value for {stock} stock is: {stock_quote2['Close'][-1]}")
 with open(f'{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
     fieldnames = ['Predicted Price', 'RMSE', 'Avg Predicted price', 'Actual Price']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writerow({'Predicted Price': ' ', 'RMSE': ' ', 'Avg Predicted price': average_stock, 'Actual Price': stock_quote2['Close'][-1]})
-
+    writer.writerow({'Predicted Price': ' ', 'RMSE': ' ', 'Avg Predicted price': average_stock,
+                     'Actual Price': stock_quote2['Close'][-1]})
