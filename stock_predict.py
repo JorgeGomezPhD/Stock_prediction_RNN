@@ -1,6 +1,5 @@
 # Description: This program uses an artificial recurrent neural network called Long Short Term Memory (LSTM) to
 # predict the closing stock price of the stock you would like by using the past 90 day stock price.
-
 # Import the libraries
 import math
 import pandas_datareader as web
@@ -23,6 +22,7 @@ def create_folder(directory):
     except OSError:
         print('Error: Creating directory. ' + directory)
 
+
 help = '''
 start - Predict stock price
 quit to exit program
@@ -37,9 +37,10 @@ end_date = '2020-09-02'
 date_today = datetime.today().strftime('%Y-%m-%d')
 pred_days = 90
 
-command =""
+command = ""
 while True:
-    command = input("What would you like to do?  For assistance type 'help.' ").lower()#if we add .lower here we will not need to add it to every line.
+    command = input(
+        "What would you like to do?  For assistance type 'help.' ").lower()
     if command == "start":
         stock = input('What stock do you want to predict? ')
         # Creates a folder in the current directory to store created files
@@ -74,7 +75,7 @@ while True:
         # Reshape the data into the shape accepted by the LSTM
         x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
         # running 10 times to take an average
-        for index in range(1,11):
+        for index in range(1, 11):
             # Build the LSTM network model
             model = Sequential()
             model.add(LSTM(units=100, return_sequences=True, input_shape=(x_train.shape[1], 1)))
@@ -89,8 +90,7 @@ while True:
             test_data = scaled_data[training_data_len - pred_days:, :]
             # Create the x_test and y_test data sets
             x_test = []
-            y_test = dataset[training_data_len:,
-                     :]  # Get all of the rows from index 1603 to the rest and all of the columns (in this case it's only column 'Close'), so 2003 - 1603 = 400 rows of data
+            y_test = dataset[training_data_len:, :]
             for i in range(pred_days, len(test_data)):
                 x_test.append(test_data[i - pred_days:i, 0])
             # Convert x_test to a numpy array
