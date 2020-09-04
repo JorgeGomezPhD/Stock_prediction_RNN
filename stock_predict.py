@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import os
 
 
-def createFolder(directory):
+def create_folder(directory):
     try:
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -44,7 +44,7 @@ while True:
         stock = input('What stock do you want to predict? ')
         # Creates a folder in the current directory to store created files
         folder_name = f'./{date_today}_{stock}_Stock_Prediction/'
-        createFolder(folder_name)
+        create_folder(folder_name)
         # Get stock quote
         df = web.DataReader(stock, data_source='yahoo', start=start_date, end=end_date)
         # Create a new dataframe with only the 'Close' column
