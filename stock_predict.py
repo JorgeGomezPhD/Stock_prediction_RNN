@@ -24,8 +24,8 @@ def create_folder(directory):
 
 
 help = '''
-start - Predict stock price
-quit to exit program
+start - Predict stock price.
+quit - Exit program.
 '''
 
 start = 'Start predicting stocks!'
