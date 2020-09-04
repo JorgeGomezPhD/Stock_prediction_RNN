@@ -40,9 +40,9 @@ pred_days = 90
 command = ""
 while True:
     command = input(
-        "What would you like to do?  For assistance type 'help.' ").lower()
+        "What would you like to do? For assistance type 'help.' ").lower()
     if command == "start":
-        stock = input('What stock do you want to predict? ')
+        stock = input('What stock do you want to predict (example Halliburton = HAL)? ')
         # Creates a folder in the current directory to store created files
         folder_name = f'./{date_today}_{stock}_Stock_Prediction/'
         create_folder(folder_name)
@@ -156,8 +156,8 @@ while True:
         with open(f'{folder_name}{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
             fieldnames = ['Predicted Price', 'RMSE', 'Avg Predicted price', 'Actual Price']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writerow({'Predicted Price': ' ', 'RMSE': ' ', 'Avg Predicted price': average_stock,
-                             'Actual Price': stock_quote2['Close'][-1]})
+            writer.writerow({'Predicted Price': ' ', 'RMSE': ' ', 'Avg Predicted price': round(average_stock, 2),
+                             'Actual Price': round(stock_quote2['Close'][-1], 2)})
     elif command == 'quit':
         break
     elif command == 'help':
