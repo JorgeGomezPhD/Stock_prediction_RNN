@@ -151,7 +151,7 @@ while True:
         stock_quote2 = web.DataReader(stock, data_source='yahoo', start='2020-09-02', end='2020-09-02')
         print(f"Average predicted price for {stock} stock = {round(average_stock, 2)}")
         # print(f"Average RMSE for {stock} stock = {round(average_rmse, 2)}")
-        print(f"The actual value for {stock} stock is: {stock_quote2['Close'][-1]}")
+        print(f"The actual value for {stock} stock is: {round(stock_quote2['Close'][-1], 2)}")
         #  Saving the average stock price and the actual stock price to CSV
         with open(f'{folder_name}{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
             fieldnames = ['Predicted Price', 'RMSE', 'Avg Predicted price', 'Actual Price']
