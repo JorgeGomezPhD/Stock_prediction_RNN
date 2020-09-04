@@ -13,12 +13,25 @@ import csv
 from statistics import mean
 from datetime import datetime
 import matplotlib.pyplot as plt
+import os
+
+
+def createFolder(directory):
+    try:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    except OSError:
+        print('Error: Creating directory. ' + directory)
+
 
 stock = input('What stock do you want to predict? ')
 start_date = '2012-01-01'
 end_date = '2020-09-01'
 date_today = datetime.today().strftime('%Y-%m-%d')
 pred_days = 90
+# Creates a folder in the current directory to store todays files
+folder_name = f'./{date_today}_{stock}_Stock_Prediction/'
+createFolder(folder_name)
 
 # Get the stock quote
 df = web.DataReader(stock, data_source='yahoo', start=start_date, end=end_date)
@@ -29,7 +42,7 @@ data = df.filter(['Close'])
 dataset = data.values
 
 #  Writing CSV to use later on
-with open(f'{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
+with open(f'{folder_name}{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
     fieldnames = ['Predicted Price', 'RMSE', 'Avg Predicted price', 'Actual Price']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
@@ -132,16 +145,16 @@ for index in range(1,11):
     plt.plot(train['Close'])
     plt.plot(valid[['Close', 'Predictions']])
     plt.legend(['Train', 'Val', 'Predictions'])
-    plt.savefig(f'{index}_{date_today}_{stock}_Stock_Prediction.jpg')
+    plt.savefig(f'{folder_name}{index}_{date_today}_{stock}_Stock_Prediction.jpg')
 
     #  Writing to Predicted price and RMSE to CSV file
-    with open(f'{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
+    with open(f'{folder_name}{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
         fieldnames = ['Predicted Price', 'RMSE']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writerow({'Predicted Price': pred_price, 'RMSE': rmse})
 
 #  Bringing back  the predicted and RMSE data back to take the average
-data_file = pd.read_csv(f'{date_today}_{stock}_Stock_Prediction.csv')
+data_file = pd.read_csv(f'{folder_name}{date_today}_{stock}_Stock_Prediction.csv')
 predicted_price_list = data_file['Predicted Price']
 rmse = data_file['RMSE']
 average_stock = mean(predicted_price_list)
@@ -154,7 +167,7 @@ print(f"Average predicted price for {stock} stock = {round(average_stock, 2)}")
 print(f"The actual value for {stock} stock is: {stock_quote2['Close'][-1]}")
 
 #  Saving the average stock price and the actual stock price to CSV
-with open(f'{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
+with open(f'{folder_name}{date_today}_{stock}_Stock_Prediction.csv', 'a') as csvfile:
     fieldnames = ['Predicted Price', 'RMSE', 'Avg Predicted price', 'Actual Price']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writerow({'Predicted Price': ' ', 'RMSE': ' ', 'Avg Predicted price': average_stock,
