@@ -10,7 +10,7 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM
 import csv
 from statistics import mean
-from datetime import datetime
+from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import os
 
@@ -30,10 +30,9 @@ quit - Exit program.
 
 start = 'Start predicting stocks!'
 idk = "I don't recognize that command. Please enter another command or type 'help' for assistance"
-
-start_date = '2012-01-01'
-end_date = '2020-09-02'
 date_today = datetime.today().strftime('%Y-%m-%d')
+start_date = '2012-01-01'
+end_date = (datetime.today() + timedelta(days=-1)).strftime('%Y-%m-%d')
 pred_days = 90
 
 command = ""
