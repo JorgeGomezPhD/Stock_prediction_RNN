@@ -31,7 +31,6 @@ quit - Exit program.
 start = 'Start predicting stocks!'
 idk = "I don't recognize that command. Please enter another command or type 'help' for assistance"
 
-# stock = input('What stock do you want to predict? ')
 start_date = '2012-01-01'
 end_date = '2020-09-02'
 date_today = datetime.today().strftime('%Y-%m-%d')
