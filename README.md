@@ -9,7 +9,7 @@ When you are done predicting stocks type 'quit' to exit program.
 - [X] Visualize predicted, training and actual data sets. 
 - [X] Allow user to type in stock ticker symbol.
 - [X] Store all predictions, average prediction and actual stock price in its own folder. 
-- [ ] Remove the necessity of user defining yersterdays date.
+- [X] Remove the necessity of user defining yersterdays date.
 - [ ] Ability to predict more than one day out.
 - [ ] GUI
 - [ ] Allow user to type in company name without the need of knowing stock ticker symbol. 
