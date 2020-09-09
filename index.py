@@ -1,7 +1,7 @@
 # Description: This program uses an artificial recurrent neural network called Long Short Term Memory (LSTM) to
 # predict the closing stock price of the stock you would like by using the past 90 day stock price.
 # Import the libraries
-from stock_predict import stock_predict
+from stock_predict import Predict
 
 
 help = '''
@@ -17,7 +17,7 @@ while True:
     command = input(
         "What would you like to do? For assistance type 'help.' ").lower()
     if command == "start":
-        stock_predict()
+        Predict.stock_predict()
     elif command == 'quit':
         break
     elif command == 'help':
