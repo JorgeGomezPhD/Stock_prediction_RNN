@@ -133,10 +133,10 @@ class Predict:
         average_stock = mean(predicted_price_list)
         average_rmse = mean(rmse)
         # # Get the quote for Sep. 2, 2020 stock
-        Predict.actual_stock_price = web.DataReader(Predict.stock, data_source='yahoo', start='2020-09-02', end='2020-09-02')
+        Predict.actual_stock_price = web.DataReader(Predict.stock, data_source='yahoo', start=date_today, end=date_today)
         print(f"Average predicted price for {Predict.stock} stock = {round(average_stock, 2)}")
         # print(f"Average RMSE for {stock} stock = {round(average_rmse, 2)}")
-        print(f"The actual value for {Predict.stock} stock is: {round(stock_quote2['Close'][-1], 2)}")
+        print(f"The actual value for {Predict.stock} stock is: {round(Predict.actual_stock_price['Close'][-1], 2)}")
         #  Saving the average stock price and the actual stock price to CSV
         with open(f'{Predict.folder_name}{date_today}_{Predict.stock}_Stock_Prediction.csv', 'a') as csvfile:
             fieldnames = ['Predicted Price', 'RMSE', 'Avg Predicted price', 'Actual Price']
