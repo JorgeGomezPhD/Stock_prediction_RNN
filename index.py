@@ -1,7 +1,7 @@
 # Description: This program uses an artificial recurrent neural network called Long Short Term Memory (LSTM) to
 # predict the closing stock price of the stock you would like by using the past 90 day stock price.
 # Import the libraries
-from stock_predict import create_folder, stock_predict
+from stock_predict import stock_predict
 
 
 help = '''
