@@ -1,5 +1,5 @@
 import math
-import pandas_datareader as web
+import yfinance as yf
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -10,6 +10,8 @@ from statistics import mean
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import os
+import warnings
+warnings.filterwarnings('ignore')
 
 
 class Predict:
@@ -31,8 +33,13 @@ class Predict:
         # Creates a folder in the current directory to store created files
         Predict.folder_name = f'./{date_today}_{Predict.stock}_Stock_Prediction/'
         Predict.create_folder(Predict.folder_name)
-        # Get stock quote
-        df = web.DataReader(Predict.stock, data_source='yahoo', start=start_date, end=end_date)
+
+        # Get stock quote from yahoo finace
+        df = yf.download(Predict.stock,
+                         start=start_date,
+                         end=end_date,
+                         progress=False,
+                         )
         # Create a new dataframe with only the 'Close' column
         data = df.filter(['Close'])
         # Converting the dataframe to a numpy array
@@ -59,8 +66,8 @@ class Predict:
         x_train, y_train = np.array(x_train), np.array(y_train)
         # Reshape the data into the shape accepted by the LSTM
         x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-        # running 10 times to take an average
-        for index in range(1, 11):
+        # running 5 times to take an average
+        for index in range(1, 6):
             # Build the LSTM network model
             model = Sequential()
             model.add(LSTM(units=100, return_sequences=True, input_shape=(x_train.shape[1], 1)))
@@ -112,6 +119,7 @@ class Predict:
             pred_price = pred_price[-1][-1]
             print(pred_price)
             print(rmse)
+
             # #Visualize the data
             plt.figure(figsize=(16, 8))
             plt.title('Model')
@@ -121,22 +129,30 @@ class Predict:
             plt.plot(valid[['Close', 'Predictions']])
             plt.legend(['Train', 'Val', 'Predictions'])
             plt.savefig(f'{Predict.folder_name}{index}_{date_today}_{Predict.stock}_Stock_Prediction.jpg')
+
             #  Writing to Predicted price and RMSE to CSV file
             with open(f'{Predict.folder_name}{date_today}_{Predict.stock}_Stock_Prediction.csv', 'a') as csvfile:
                 fieldnames = ['Predicted Price', 'RMSE']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writerow({'Predicted Price': pred_price, 'RMSE': rmse})
+
         #  Bringing back the predicted and RMSE data back to take the average
         data_file = pd.read_csv(f'{Predict.folder_name}{date_today}_{Predict.stock}_Stock_Prediction.csv')
         predicted_price_list = data_file['Predicted Price']
         rmse = data_file['RMSE']
         average_stock = mean(predicted_price_list)
         average_rmse = mean(rmse)
-        # # Get the quote for Sep. 2, 2020 stock
-        Predict.actual_stock_price = web.DataReader(Predict.stock, data_source='yahoo', start=date_today, end=date_today)
+
+        # # Get the quote for todays date
+        Predict.actual_stock_price = yf.download(Predict.stock,
+                         start=start_date,
+                         end=end_date,
+                         progress=False,
+                         )
         print(f"Average predicted price for {Predict.stock} stock = {round(average_stock, 2)}")
-        # print(f"Average RMSE for {stock} stock = {round(average_rmse, 2)}")
+        print(f"Average RMSE for {Predict.stock} stock = {round(average_rmse, 2)}")
         print(f"The actual value for {Predict.stock} stock is: {round(Predict.actual_stock_price['Close'][-1], 2)}")
+
         #  Saving the average stock price and the actual stock price to CSV
         with open(f'{Predict.folder_name}{date_today}_{Predict.stock}_Stock_Prediction.csv', 'a') as csvfile:
             fieldnames = ['Predicted Price', 'RMSE', 'Avg Predicted price', 'Actual Price']
